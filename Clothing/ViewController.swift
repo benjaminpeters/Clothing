@@ -23,6 +23,8 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
     override func viewDidLoad() {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("onVenuesUpdated:"), name: API.notifications.venuesUpdated, object: nil)
         super.viewDidLoad()
+        
+        print(mapView?.visibleMapRect)
         // Do any additional setup after loading the view, typically from a nib.
     }
 
@@ -172,6 +174,33 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
         {
             let region = MKCoordinateRegionMakeWithDistance(CLLocationCoordinate2D(latitude: Double(venue.latitude), longitude: Double(venue.longitude)), distanceSpan, distanceSpan)
             mapView?.setRegion(region, animated: true)
+        }
+    }
+    
+    
+    private func mapViewRegionDidChangeFromUserInteraction() -> Bool {
+        let view = mapView!.subviews[0]
+        //  Look through gesture recognizers to determine whether this region change is from user interaction
+        if let gestureRecognizers = view.gestureRecognizers {
+            for recognizer in gestureRecognizers {
+                if( recognizer.state == UIGestureRecognizerState.Began || recognizer.state == UIGestureRecognizerState.Ended ) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    private var mapChangedFromUserInteraction = false
+
+    func mapView(mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
+        mapChangedFromUserInteraction = mapViewRegionDidChangeFromUserInteraction()
+
+        if (mapChangedFromUserInteraction){
+            print(mapView.visibleMapRect)
+            print(mapView.centerCoordinate)
+            var LocationAtual: CLLocation = CLLocation(latitude: mapView.centerCoordinate.latitude, longitude: mapView.centerCoordinate.longitude)
+            print(LocationAtual)
+            refreshVenues(LocationAtual, getDataFromFoursquare: true)
         }
     }
     
