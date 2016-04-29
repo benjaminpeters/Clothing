@@ -16,7 +16,7 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
     @IBOutlet var tableView:UITableView?
 
     var locationManager:CLLocationManager?
-    let distanceSpan:Double = 500
+    var distanceSpan:Double = 500
     var lastLocation:CLLocation?
     var venues:[Venue]?
     
@@ -199,7 +199,12 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
             print(mapView.visibleMapRect)
             print(mapView.centerCoordinate)
             var LocationAtual: CLLocation = CLLocation(latitude: mapView.centerCoordinate.latitude, longitude: mapView.centerCoordinate.longitude)
-            print(LocationAtual)
+            print(mapView.visibleMapRect.size.width)
+            distanceSpan =  mapView.visibleMapRect.size.width / 2
+            
+            let allAnnotations = mapView.annotations
+            mapView.removeAnnotations(allAnnotations)
+            
             refreshVenues(LocationAtual, getDataFromFoursquare: true)
         }
     }
